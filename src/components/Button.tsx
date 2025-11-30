@@ -1,3 +1,5 @@
+// src/components/Button.tsx
+
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
@@ -14,10 +16,12 @@ const baseClasses =
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary: 'bg-slate-900 text-white hover:bg-slate-800',
-  secondary: 'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-300',
+  secondary:
+    'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-300',
   ghost: 'bg-transparent text-slate-700 hover:bg-slate-100',
   danger: 'bg-rose-600 text-white hover:bg-rose-500',
-  outline: 'bg-transparent text-slate-800 border border-slate-300 hover:bg-slate-50',
+  outline:
+    'bg-transparent text-slate-800 border border-slate-300 hover:bg-slate-50',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

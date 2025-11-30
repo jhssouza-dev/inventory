@@ -1,3 +1,5 @@
+// src/pages/StockMovements.tsx
+
 import { useMemo, useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import StockMovementForm from '../components/StockMovementForm';
@@ -26,18 +28,18 @@ const StockMovements = () => {
         return false;
       }
 
+      const movementDate = new Date(movement.date);
+
       // Filter by start date
       if (dateFrom) {
         const from = new Date(dateFrom);
-        const movementDate = new Date(movement.date);
         if (movementDate < from) return false;
       }
 
       // Filter by end date (inclusive)
       if (dateTo) {
         const to = new Date(dateTo);
-        to.setDate(to.getDate() + 1); // include the entire end day
-        const movementDate = new Date(movement.date);
+        to.setDate(to.getDate() + 1); // inclui o dia inteiro
         if (movementDate >= to) return false;
       }
 
@@ -47,6 +49,7 @@ const StockMovements = () => {
 
   return (
     <div className="space-y-4">
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-slate-800">
           Stock Movements
@@ -58,6 +61,7 @@ const StockMovements = () => {
 
       {/* Filters */}
       <div className="bg-white rounded-lg border border-slate-200 p-3 grid grid-cols-1 md:grid-cols-4 gap-3">
+        {/* Product filter */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-700">
             Product
@@ -76,6 +80,7 @@ const StockMovements = () => {
           </select>
         </div>
 
+        {/* Type filter */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-700">
             Type
@@ -93,6 +98,7 @@ const StockMovements = () => {
           </select>
         </div>
 
+        {/* From date */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-700">
             From date
@@ -105,6 +111,7 @@ const StockMovements = () => {
           />
         </div>
 
+        {/* To date */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-700">
             To date
@@ -118,8 +125,10 @@ const StockMovements = () => {
         </div>
       </div>
 
+      {/* Form to register new movement */}
       <StockMovementForm />
 
+      {/* Table of movements */}
       <StockMovementsTable movements={filteredMovements} />
     </div>
   );

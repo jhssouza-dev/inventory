@@ -1,3 +1,5 @@
+// src/components/StockMovementsTable.tsx
+
 import type { StockMovement } from '../types/inventory';
 import { formatDateTimeShort } from '../utils/format';
 import { useInventory } from '../context/InventoryContext';
@@ -49,6 +51,7 @@ const StockMovementsTable = ({ movements }: StockMovementsTableProps) => {
                 key={movement.id}
                 className="border-t border-slate-100 hover:bg-slate-50/70"
               >
+                {/* Product */}
                 <td className="px-4 py-2">
                   {product ? (
                     <span className="font-medium text-slate-800">
@@ -61,6 +64,7 @@ const StockMovementsTable = ({ movements }: StockMovementsTableProps) => {
                   )}
                 </td>
 
+                {/* Type */}
                 <td className="px-4 py-2 text-center">
                   <span
                     className={`px-2 py-0.5 rounded text-xs font-medium ${
@@ -73,16 +77,21 @@ const StockMovementsTable = ({ movements }: StockMovementsTableProps) => {
                   </span>
                 </td>
 
-                <td className="px-4 py-2 text-center">
-                  {movement.quantity}
+                {/* Quantity */}
+                <td className="px-4 py-2 text-center font-mono">
+                  {movement.type === 'OUT'
+                    ? `-${movement.quantity}`
+                    : movement.quantity}
                 </td>
 
+                {/* Date */}
                 <td className="px-4 py-2">
                   {formatDateTimeShort(movement.date)}
                 </td>
 
+                {/* Notes */}
                 <td className="px-4 py-2 text-slate-700">
-                  {movement.notes ?? (
+                  {movement.notes?.trim() || (
                     <span className="text-slate-400 italic">–</span>
                   )}
                 </td>

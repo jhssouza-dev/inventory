@@ -1,6 +1,6 @@
+// src/utils/format.ts
 
-
-// Format currency as EUR (€)
+// Currency format with Euro (€)
 export const formatCurrency = (value: number): string =>
   new Intl.NumberFormat('de-DE', {
     style: 'currency',
@@ -8,7 +8,14 @@ export const formatCurrency = (value: number): string =>
     minimumFractionDigits: 2,
   }).format(value);
 
-// Short date/time formatted for display
+// Number format WITHOUT currency symbol (used in input fields)
+export const formatNumberDE = (value: number): string =>
+  new Intl.NumberFormat('de-DE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
+// Date-Time short
 export const formatDateTimeShort = (value: string | Date): string => {
   const date = typeof value === 'string' ? new Date(value) : value;
 

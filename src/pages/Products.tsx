@@ -1,13 +1,18 @@
+// src/pages/Products.tsx
+
 import { useState } from 'react';
 import type { Product } from '../types/inventory';
+
 import ProductTable from '../components/ProductTable';
 import ProductForm from '../components/ProductForm';
 import EditProductForm from '../components/EditProductForm';
+
 import { useInventory } from '../context/InventoryContext';
 import { fetchProductsFromApi } from '../api/dummyProducts';
 
 const Products = () => {
   const { addProduct, products } = useInventory();
+
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -20,18 +25,19 @@ const Products = () => {
       setIsImporting(true);
       setImportError(null);
 
-      const importedProducts = await fetchProductsFromApi(20);
-
+      const imported = await fetchProductsFromApi(20);
       const existingSkus = new Set(products.map((p) => p.sku));
 
-      importedProducts.forEach((p) => {
+      imported.forEach((p) => {
         if (!existingSkus.has(p.sku)) {
           addProduct(p);
         }
       });
     } catch (error) {
       console.error(error);
-      setImportError('Error importing products from the API. Please try again.');
+      setImportError(
+        'Error importing products from the API. Please try again.',
+      );
     } finally {
       setIsImporting(false);
     }
@@ -39,7 +45,7 @@ const Products = () => {
 
   return (
     <div className="space-y-4">
-      {/* Header + Import button */}
+      {/* Header */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-800">Products</h1>
@@ -52,12 +58,13 @@ const Products = () => {
           type="button"
           onClick={handleImportFromApi}
           disabled={isImporting}
-          className="inline-flex items-center rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+          className="inline-flex items-center rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
-          {isImporting ? 'Importing...' : 'Import Products from API'}
+          {isImporting ? 'Importing…' : 'Import Products from API'}
         </button>
       </div>
 
+      {/* Import errors */}
       {importError && (
         <div className="rounded border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
           {importError}
@@ -68,6 +75,7 @@ const Products = () => {
       <div className="bg-white rounded-lg border border-slate-200 p-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="flex-1 flex items-center gap-2">
           <label className="text-xs font-medium text-slate-700">Search:</label>
+
           <input
             type="text"
             value={searchTerm}
@@ -88,10 +96,10 @@ const Products = () => {
         </label>
       </div>
 
-      {/* New product form */}
+      {/* Create product form */}
       <ProductForm />
 
-      {/* Product edit (conditionally rendered) */}
+      {/* Edit product form */}
       {editingProduct && (
         <EditProductForm
           product={editingProduct}
@@ -99,7 +107,7 @@ const Products = () => {
         />
       )}
 
-      {/* Filtered product table */}
+      {/* Table */}
       <ProductTable
         onEdit={(product) => setEditingProduct(product)}
         searchTerm={searchTerm}

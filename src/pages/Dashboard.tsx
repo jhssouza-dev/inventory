@@ -1,3 +1,5 @@
+// src/pages/Dashboard.tsx
+
 import { useMemo } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import StatusBadge from '../components/StatusBadge';
@@ -28,7 +30,7 @@ const Dashboard = () => {
   const lowStockCount = useMemo(
     () =>
       products.filter(
-        (p) => p.currentStock > 0 && p.currentStock <= p.minStock,
+        (p) => p.currentStock > 0 && p.currentStock < p.minStock,
       ).length,
     [products],
   );
@@ -95,7 +97,6 @@ const Dashboard = () => {
         <h3 className="text-sm font-semibold text-slate-700 mb-4">
           Top Products by Inventory Value
         </h3>
-        {/* StockValueChart uses products from context */}
         <StockValueChart />
       </div>
 

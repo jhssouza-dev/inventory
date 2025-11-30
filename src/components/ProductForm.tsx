@@ -1,17 +1,37 @@
+// src/components/ProductForm.tsx
+
 import { useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, ChangeEvent } from 'react';
 import { useInventory } from '../context/InventoryContext';
+import { formatNumberDE } from '../utils/format';
 
 const ProductForm = () => {
   const { addProduct } = useInventory();
 
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
-  const [price, setPrice] = useState('');
+  const [price, setPrice] = useState(''); // string formatada ex: "12,50"
   const [minStock, setMinStock] = useState('');
   const [initialStock, setInitialStock] = useState('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const handlePriceChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.target.value;
+
+    // mantém apenas dígitos
+    const digits = input.replace(/\D/g, '');
+
+    if (!digits) {
+      setPrice('');
+      return;
+    }
+
+    const number = Number(digits) / 100;
+    const formatted = formatNumberDE(number);
+
+    setPrice(formatted);
+  };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -27,7 +47,10 @@ const ProductForm = () => {
       return;
     }
 
-    const priceNumber = Number(price.replace(',', '.'));
+    // "1.234,56" -> 1234.56
+    const priceNumber = Number(
+      price.replace(/\./g, '').replace(',', '.'),
+    );
     const minStockNumber = Number(minStock);
     const initialStockNumber = initialStock ? Number(initialStock) : 0;
 
@@ -115,13 +138,12 @@ const ProductForm = () => {
             Preço (€) *
           </label>
           <input
-            type="number"
-            min={0}
-            step="0.01"
+            type="text"
             className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500/50"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={handlePriceChange}
             placeholder="0,00"
+            inputMode="decimal"
           />
         </div>
 
@@ -168,7 +190,7 @@ const ProductForm = () => {
         <div className="md:col-span-2 flex justify-end pt-1">
           <button
             type="submit"
-            className="inline-flex items-center rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Salvar produto
           </button>

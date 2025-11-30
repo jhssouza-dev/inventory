@@ -1,10 +1,12 @@
+// src/components/StatusBadge.tsx
+
 import type { StockStatus } from '../types/inventory';
 
 interface StatusBadgeProps {
   status: StockStatus;
 }
 
-const statusConfig: Record<
+const STATUS_STYLES: Record<
   StockStatus,
   { label: string; className: string }
 > = {
@@ -23,13 +25,13 @@ const statusConfig: Record<
 };
 
 const StatusBadge = ({ status }: StatusBadgeProps) => {
-  const config = statusConfig[status];
+  const { label, className } = STATUS_STYLES[status];
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${config.className}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${className}`}
     >
-      {config.label}
+      {label}
     </span>
   );
 };

@@ -1,3 +1,5 @@
+// src/components/ProductTable.tsx
+
 import { useInventory } from '../context/InventoryContext';
 import StatusBadge from './StatusBadge';
 import { formatCurrency } from '../utils/format';
@@ -55,122 +57,134 @@ const ProductTable = ({ onEdit, searchTerm, onlyActive }: ProductTableProps) => 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-      <table className="min-w-full text-sm">
-        <thead className="bg-slate-50 border-b border-slate-200">
-          <tr>
-            <th className="text-left px-4 py-2 font-medium text-slate-600">
-              Product
-            </th>
-            <th className="text-left px-4 py-2 font-medium text-slate-600">
-              SKU
-            </th>
-            <th className="text-right px-4 py-2 font-medium text-slate-600">
-              Price
-            </th>
-            <th className="text-right px-4 py-2 font-medium text-slate-600">
-              Stock
-            </th>
-            <th className="text-right px-4 py-2 font-medium text-slate-600">
-              Minimum
-            </th>
-            <th className="text-center px-4 py-2 font-medium text-slate-600">
-              Status
-            </th>
-            <th className="text-center px-4 py-2 font-medium text-slate-600">
-              Active
-            </th>
-            <th className="text-center px-4 py-2 font-medium text-slate-600">
-              Actions
-            </th>
-          </tr>
-        </thead>
+    <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+      <div className="overflow-x-auto">
+        <table className="min-w-full md:min-w-[800px] text-sm">
+          <thead className="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th className="text-left px-4 py-2 font-medium text-slate-600">
+                Product
+              </th>
+              <th className="text-left px-4 py-2 font-medium text-slate-600 hidden sm:table-cell">
+                SKU
+              </th>
+              <th className="text-right px-4 py-2 font-medium text-slate-600 hidden sm:table-cell">
+                Price
+              </th>
+              <th className="text-right px-4 py-2 font-medium text-slate-600">
+                Stock
+              </th>
+              <th className="text-right px-4 py-2 font-medium text-slate-600 hidden sm:table-cell">
+                Minimum
+              </th>
+              <th className="text-center px-4 py-2 font-medium text-slate-600">
+                Status
+              </th>
+              <th className="text-center px-4 py-2 font-medium text-slate-600 hidden sm:table-cell">
+                Active
+              </th>
+              <th className="text-center px-4 py-2 font-medium text-slate-600">
+                Actions
+              </th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {filteredProducts.map((product) => {
-            const status = getStockStatus(product);
+          <tbody>
+            {filteredProducts.map((product) => {
+              const status = getStockStatus(product);
 
-            return (
-              <tr
-                key={product.id}
-                className="border-t border-slate-100 hover:bg-slate-50/60"
-              >
-                <td className="px-4 py-2">
-                  <div className="flex flex-col">
-                    <span className="font-medium text-slate-800">
-                      {product.name}
-                    </span>
-                    {product.description && (
-                      <span className="text-xs text-slate-500">
-                        {product.description}
+              return (
+                <tr
+                  key={product.id}
+                  className="border-t border-slate-100 hover:bg-slate-50/60"
+                >
+                  {/* Product + description */}
+                  <td className="px-4 py-2 align-top">
+                    <div className="flex flex-col">
+                      <span className="font-medium text-slate-800 text-sm">
+                        {product.name}
                       </span>
+                      {product.description && (
+                        <span className="text-xs text-slate-500 line-clamp-2">
+                          {product.description}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* SKU */}
+                  <td className="px-4 py-2 text-slate-700 hidden sm:table-cell align-top">
+                    <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded">
+                      {product.sku}
+                    </span>
+                  </td>
+
+                  {/* Price */}
+                  <td className="px-4 py-2 text-right text-slate-700 hidden sm:table-cell align-top whitespace-nowrap">
+                    {formatCurrency(product.price)}
+                  </td>
+
+                  {/* Current stock */}
+                  <td className="px-4 py-2 text-right text-slate-800 align-top">
+                    {product.currentStock}
+                  </td>
+
+                  {/* Min stock */}
+                  <td className="px-4 py-2 text-right text-slate-700 hidden sm:table-cell align-top">
+                    {product.minStock}
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-4 py-2 text-center align-top">
+                    <StatusBadge status={status} />
+                  </td>
+
+                  {/* Active indicator */}
+                  <td className="px-4 py-2 text-center hidden sm:table-cell align-top">
+                    {product.isActive ? (
+                      <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                    ) : (
+                      <span className="inline-flex h-2 w-2 rounded-full bg-slate-400" />
                     )}
-                  </div>
-                </td>
+                  </td>
 
-                <td className="px-4 py-2 text-slate-700">
-                  <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded">
-                    {product.sku}
-                  </span>
-                </td>
+                  {/* Actions */}
+                  <td className="px-4 py-2 text-center align-top">
+                    <div className="flex flex-col gap-1 items-center text-[11px]">
+                      {onEdit && (
+                        <button
+                          type="button"
+                          onClick={() => onEdit(product)}
+                          className="text-slate-700 hover:text-slate-900 underline cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                      )}
 
-                <td className="px-4 py-2 text-right text-slate-700">
-                  {formatCurrency(product.price)}
-                </td>
-
-                <td className="px-4 py-2 text-right text-slate-800">
-                  {product.currentStock}
-                </td>
-
-                <td className="px-4 py-2 text-right text-slate-700">
-                  {product.minStock}
-                </td>
-
-                <td className="px-4 py-2 text-center">
-                  <StatusBadge status={status} />
-                </td>
-
-                <td className="px-4 py-2 text-center">
-                  {product.isActive ? (
-                    <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                  ) : (
-                    <span className="inline-flex h-2 w-2 rounded-full bg-slate-400" />
-                  )}
-                </td>
-
-                <td className="px-4 py-2 text-center">
-                  <div className="flex flex-col gap-1 items-center">
-                    {onEdit && (
                       <button
                         type="button"
-                        onClick={() => onEdit(product)}
-                        className="text-xs text-slate-700 hover:text-slate-900 underline"
+                        onClick={() => handleArchive(product)}
+                        className="text-amber-700 hover:text-amber-900 underline disabled:text-slate-400 cursor-pointer"
+                        disabled={!product.isActive}
                       >
-                        Edit
+                        {product.isActive ? 'Archive' : 'Archived'}
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleArchive(product)}
-                      className="text-[11px] text-amber-700 hover:text-amber-900 underline"
-                      disabled={!product.isActive}
-                    >
-                      {product.isActive ? 'Archive' : 'Archived'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(product)}
-                      className="text-[11px] text-rose-700 hover:text-rose-900 underline"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(product)}
+                        className="text-rose-700 hover:text-rose-900 underline cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

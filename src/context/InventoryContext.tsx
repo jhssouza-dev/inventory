@@ -1,3 +1,5 @@
+// src/context/InventoryContext.tsx
+
 import {
   createContext,
   useContext,
@@ -51,7 +53,7 @@ interface MovementResult {
 // ---- Context shape ----
 
 interface InventoryContextValue {
-  products: Product[];
+  products: Product[];      // <-- array, não Product único
   movements: StockMovement[];
 
   addProduct: (data: CreateProductInput) => void;
@@ -229,7 +231,7 @@ export const InventoryProvider = ({ children }: InventoryProviderProps) => {
     setData((prev) => ({
       ...prev,
       products: prev.products.filter((product) => product.id !== id),
-      // Keep movements; UI already handles "Product removed"
+      // Keep movements; UI already handles "Removed product"
     }));
   };
 

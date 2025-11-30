@@ -1,8 +1,11 @@
+// src/components/EditProductForm.tsx
+
 import { useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, ChangeEvent } from 'react';
 import type { Product } from '../types/inventory';
 import { useInventory } from '../context/InventoryContext';
 import Button from './Button';
+import { formatNumberDE } from '../utils/format';
 
 interface EditProductFormProps {
   product: Product;
@@ -14,11 +17,33 @@ const EditProductForm = ({ product, onCancel }: EditProductFormProps) => {
 
   const [name, setName] = useState(product.name);
   const [sku, setSku] = useState(product.sku);
-  const [price, setPrice] = useState(String(product.price));
+
+  // Inicializa o preço já formatado no padrão de-DE (ex: "12,50")
+  const [price, setPrice] = useState(
+    product.price != null ? formatNumberDE(product.price) : '',
+  );
+
   const [minStock, setMinStock] = useState(String(product.minStock));
   const [description, setDescription] = useState(product.description ?? '');
   const [isActive, setIsActive] = useState(product.isActive);
   const [error, setError] = useState<string | null>(null);
+
+  const handlePriceChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.target.value;
+
+    // mantém apenas dígitos
+    const digits = input.replace(/\D/g, '');
+
+    if (!digits) {
+      setPrice('');
+      return;
+    }
+
+    const number = Number(digits) / 100;
+    const formatted = formatNumberDE(number);
+
+    setPrice(formatted);
+  };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -34,7 +59,10 @@ const EditProductForm = ({ product, onCancel }: EditProductFormProps) => {
       return;
     }
 
-    const priceNumber = Number(price.replace(',', '.'));
+    // Converte string "1.234,56" → 1234.56
+    const priceNumber = Number(
+      price.replace(/\./g, '').replace(',', '.'),
+    );
     const minStockNumber = Number(minStock);
 
     if (Number.isNaN(priceNumber) || priceNumber < 0) {
@@ -69,7 +97,7 @@ const EditProductForm = ({ product, onCancel }: EditProductFormProps) => {
         <button
           type="button"
           onClick={onCancel}
-          className="text-[11px] text-slate-500 hover:text-slate-700"
+          className="text-[11px] text-slate-500 hover:text-slate-700 "
         >
           Fechar
         </button>
@@ -114,12 +142,12 @@ const EditProductForm = ({ product, onCancel }: EditProductFormProps) => {
             Preço (€) *
           </label>
           <input
-            type="number"
-            min={0}
-            step="0.01"
+            type="text" // importante: text, para máscara funcionar
             className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500/50"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={handlePriceChange}
+            placeholder="0,00"
+            inputMode="decimal"
           />
         </div>
 

@@ -1,3 +1,5 @@
+// src/components/StockMovementForm.tsx
+
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useInventory } from '../context/InventoryContext';
@@ -40,7 +42,7 @@ const StockMovementForm = () => {
       return;
     }
 
-    // Success → reset fields
+    // Reset fields after success
     setQuantity('');
     setNotes('');
   };
@@ -53,22 +55,23 @@ const StockMovementForm = () => {
     );
   }
 
+  // UI Calculations
   const selectedProduct = products.find((p) => p.id === productId);
   const currentStock = selectedProduct?.currentStock ?? 0;
   const minStock = selectedProduct?.minStock;
 
   const quantityNumber = Number(quantity);
-  const validQuantity = !Number.isNaN(quantityNumber) && quantityNumber > 0;
+  const validQty = !Number.isNaN(quantityNumber) && quantityNumber > 0;
 
   const projectedStock =
-    validQuantity && selectedProduct
+    validQty && selectedProduct
       ? type === 'IN'
         ? currentStock + quantityNumber
         : currentStock - quantityNumber
       : null;
 
   const attemptingOverRemoval =
-    type === 'OUT' && validQuantity && quantityNumber > currentStock;
+    type === 'OUT' && validQty && quantityNumber > currentStock;
 
   return (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 md:p-5 mb-4">
@@ -109,15 +112,15 @@ const StockMovementForm = () => {
             ))}
           </select>
 
-          {/* Stock info */}
           {selectedProduct && (
             <div className="mt-1 text-[11px] text-slate-500 flex flex-wrap gap-x-3 gap-y-1">
               <span>
-                Current stock:{' '}
+                Current:{' '}
                 <span className="font-mono text-slate-800">
                   {currentStock}
                 </span>
               </span>
+
               {typeof minStock === 'number' && (
                 <span>
                   Minimum:{' '}
@@ -130,7 +133,7 @@ const StockMovementForm = () => {
           )}
         </div>
 
-        {/* Type selector */}
+        {/* Movement type */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-700">
             Type *
@@ -139,7 +142,7 @@ const StockMovementForm = () => {
             <button
               type="button"
               onClick={() => setType('IN')}
-              className={`flex-1 rounded-md border px-2 py-1.5 transition-colors ${
+              className={`flex-1 rounded-md border px-2 py-1.5 transition-colors cursor-pointer ${
                 type === 'IN'
                   ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                   : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
@@ -147,10 +150,11 @@ const StockMovementForm = () => {
             >
               Entry
             </button>
+
             <button
               type="button"
               onClick={() => setType('OUT')}
-              className={`flex-1 rounded-md border px-2 py-1.5 transition-colors ${
+              className={`flex-1 rounded-md border px-2 py-1.5 transition-colors cursor-pointer ${
                 type === 'OUT'
                   ? 'border-rose-500 bg-rose-50 text-rose-700'
                   : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
@@ -161,11 +165,12 @@ const StockMovementForm = () => {
           </div>
         </div>
 
-        {/* Quantity + projected stock */}
+        {/* Quantity */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-700">
             Quantity *
           </label>
+
           <input
             type="number"
             min={1}
@@ -177,12 +182,10 @@ const StockMovementForm = () => {
 
           {selectedProduct && (
             <div className="mt-1 space-y-0.5">
-              {validQuantity && projectedStock !== null && (
+              {validQty && projectedStock !== null && (
                 <p
                   className={`text-[11px] ${
-                    attemptingOverRemoval
-                      ? 'text-rose-600'
-                      : 'text-slate-500'
+                    attemptingOverRemoval ? 'text-rose-600' : 'text-slate-500'
                   }`}
                 >
                   After {type === 'IN' ? 'entry' : 'exit'}:{' '}
@@ -203,9 +206,8 @@ const StockMovementForm = () => {
 
         {/* Notes */}
         <div className="flex flex-col gap-1 md:col-span-3">
-          <label className="text-xs font-medium text-slate-700">
-            Notes
-          </label>
+          <label className="text-xs font-medium text-slate-700">Notes</label>
+
           <textarea
             className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500/50 min-h-[70px]"
             value={notes}

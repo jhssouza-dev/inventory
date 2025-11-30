@@ -1,3 +1,4 @@
+// src/components/StockValueChart.tsx
 import { useMemo } from 'react';
 import {
   Bar,
@@ -14,10 +15,10 @@ import { useInventory } from '../context/InventoryContext';
 
 interface ChartItem {
   id: string;
-  name: string;          // nome encurtado para o eixo
-  fullName: string;      // nome completo para tooltip
-  value: number;         // valor numérico para o gráfico
-  formattedValue: string; // valor já formatado em €
+  name: string;           // nome encurtado para exibição
+  fullName: string;       // nome completo para tooltip
+  value: number;          // valor total (stock * price)
+  formattedValue: string; // valor formatado (€)
 }
 
 const formatCurrency = (value: number) =>
@@ -27,40 +28,40 @@ const formatCurrency = (value: number) =>
     minimumFractionDigits: 2,
   }).format(value);
 
-// Paleta de cores para dar mais vida ao gráfico
-const barColors = [
-  '#0f766e', // teal
-  '#2563eb', // blue
-  '#7c3aed', // violet
-  '#ea580c', // orange
-  '#16a34a', // green
-  '#db2777', // pink
-  '#075985', // sky
-  '#4338ca', // indigo
-  '#b91c1c', // red
-  '#047857', // emerald
+// Cores variadas para barras
+const BAR_COLORS = [
+  '#0f766e',
+  '#2563eb',
+  '#7c3aed',
+  '#ea580c',
+  '#16a34a',
+  '#db2777',
+  '#075985',
+  '#4338ca',
+  '#b91c1c',
+  '#047857',
 ];
 
 const StockValueChart = () => {
   const { products } = useInventory();
 
   const data: ChartItem[] = useMemo(() => {
-    const mapped = products.map((p) => {
-      const fullName = p.name;
-      const short =
-        fullName.length > 22 ? `${fullName.slice(0, 22)}…` : fullName;
-      const value = p.currentStock * p.price;
+    return products
+      .map((p) => {
+        const fullName = p.name;
+        const shortName =
+          fullName.length > 22 ? `${fullName.slice(0, 22)}…` : fullName;
 
-      return {
-        id: p.id,
-        name: short,
-        fullName,
-        value,
-        formattedValue: formatCurrency(value),
-      };
-    });
+        const value = Math.max(0, p.currentStock * p.price); // proteção extra
 
-    return mapped
+        return {
+          id: p.id,
+          name: shortName,
+          fullName,
+          value,
+          formattedValue: formatCurrency(value),
+        };
+      })
       .sort((a, b) => b.value - a.value)
       .slice(0, 10);
   }, [products]);
@@ -79,7 +80,7 @@ const StockValueChart = () => {
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 16, right: 40, left: 10}}
+          margin={{ top: 16, right: 40, left: 10 }}
         >
           <CartesianGrid
             strokeDasharray="2 4"
@@ -104,7 +105,7 @@ const StockValueChart = () => {
             tick={{ fontSize: 11, fill: '#0f172a' }}
             axisLine={false}
             tickLine={false}
-            width={110}
+            width={120}
           />
 
           <Tooltip
@@ -115,23 +116,16 @@ const StockValueChart = () => {
               boxShadow: '0 10px 30px rgba(15, 23, 42, 0.18)',
               fontSize: 12,
             }}
-            formatter={(value: number) => [
+            formatter={(value) => [
               formatCurrency(Number(value)),
               'Valor em estoque',
             ]}
-            labelFormatter={(_, payload) => {
-              const item = payload?.[0]?.payload as ChartItem | undefined;
-              return item ? item.fullName : '';
-            }}
+            labelFormatter={(_, payload) =>
+              payload?.[0]?.payload?.fullName ?? ''
+            }
           />
 
-          <Bar
-            dataKey="value"
-            radius={[4, 4, 4, 4]}
-            barSize={18}
-            isAnimationActive
-          >
-            {/* Usa o campo já formatado, sem formatter */}
+          <Bar dataKey="value" radius={[4, 4, 4, 4]} barSize={18}>
             <LabelList
               dataKey="formattedValue"
               position="right"
@@ -140,7 +134,7 @@ const StockValueChart = () => {
             {data.map((entry, index) => (
               <Cell
                 key={entry.id}
-                fill={barColors[index % barColors.length]}
+                fill={BAR_COLORS[index % BAR_COLORS.length]}
               />
             ))}
           </Bar>
